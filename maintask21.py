@@ -31,11 +31,8 @@ def knn(dataset, target, k):
     #for datas in topk:
     #    print("{} index {} with a distance {}".format(dataset[datas[1]], datas[1] , datas[0]))
 
-
-
 def compare(data, target):
-    #Two rows in the dataset as imput, and return distance.
-    #Use Euclidian distance.
+    """ compute the distance to an input vector(list) to an index in the dataset as Euclidian distance """
     #sqrt ((xd-xt)^2+...+(xn-xt)^2)
     distance = 0
     #Itterate tru ever value expect the classification of the vectors
@@ -54,6 +51,7 @@ def regression(data, target, k):
     #Return the mean value.
     print("mean value for target data[{}]={} is {}".format(target,data[target],mean))
 
+#Load the data for regression and find the value.
 data = loadData('dataset/knn_regression.csv')
 regression(data, 123, 10)
 
@@ -79,6 +77,9 @@ def classify(data, x, k):
         dictCounter[data[index][ypos]] = dictCounter.get(data[index][ypos],0) + 1   
     print("{} classified as {}".format(x ,max(dictCounter.items(), key=operator.itemgetter(1))[0]))
     
+
+#####Classification task################
+
 #We need to change dataset, otherwise we wont match the length
 data = loadData('dataset/knn_classification.csv')
 classify(data,[6.3, 2.7, 4.91, 1.8],10)
