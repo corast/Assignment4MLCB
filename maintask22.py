@@ -20,11 +20,10 @@ adaboost_train = loadData("dataset/adaboost_train.csv")
 #Index 0 is the index, 1 is the y value, rest are attributes for classifying.
 
 
-def calculateWeights(M,sample_w, prediction,E_wrong, E_correct):
-    """ Update weights """
+def INCORRECT_calculateWeightsOLD(M,sample_w, prediction,E_wrong, E_correct):
     #From wikipedia: Sum_weigths_correct_t+1/Sum_weigths_wrong_t+1 = Sum_weigths_correct_t/Sum_weigths_wrong_t
     #Which simplifies calculating the new weights.
-    #Weights of all correct is 1/2, weight of all wrong is 1/2 as well.
+    #Weights of all correct is 1/2, weight of all wrong is 1/2 
     #we can simplify the calculation of new weights.
     Z_c = sum(np.multiply(sample_w,E_correct))
     Z_w = sum(np.multiply(sample_w,E_wrong))
@@ -41,8 +40,8 @@ def calculateWeights(M,sample_w, prediction,E_wrong, E_correct):
     #print(sum(sample_w))
     return sample_w
 
-def calculateWeightsTwo(M,sample_w, alpha_t,predictions,Y):
-    """ Old method  """
+def calculateWeights(M,sample_w, alpha_t,predictions,Y):
+    """ Calculate weights """
     Z = 0
     for m, weight in enumerate(sample_w):
         #Need to calculate
@@ -67,6 +66,7 @@ def addaBoost(T, trainingData, testData):
     #To test tree later on.
     Y_test = testData[:,0]
     X_test = testData[...,1:]
+    M_test = len(Y_test)
     #store the weight assosiated with ech classifier
     weights_classifier = []
     classification_predictions = [] #Store the prediction of every tree.
@@ -77,25 +77,23 @@ def addaBoost(T, trainingData, testData):
 
     #We want to initialize the weights corresponding to m data.
     sample_w = np.array([1/M]*M) #first element correspond to first data row etc.
-
+    #print(sample_w.shape)
     for t in range(T):
         tree = dtree.fit(X,Y,sample_weight=sample_w)
     
         predictions = tree.predict(X)
         #predictions2 = tree.predict(X_test)
         #We need to take the prediction and figure out how many are wrong, and adjust those
-        """ TODO: Feil, skal legge sammen vektene ikke bare at de er feil"""
         E_wrong = np.array([int(i) for i in (predictions != Y)]) #create list of which index is wrong
-        E_correct = np.array([int(i) for i in (predictions == Y)]) #create list of which index is wrong
+        #E_correct = np.array([int(i) for i in (predictions == Y)]) #create list of which index is correct(if needed)
 
-        #We know that the sum of this one represent the number e
-        e_t = sum(E_wrong)/M #number of mistakes/ number of data entries.
+        #Now we need to dot with the corresponding weight for that row in the dataset which is wrong.
+        e_t = np.dot(sample_w,E_wrong) 
 
-        alpha_t = 1/2 * np.log((1-e_t)/e_t) 
-        weights_classifier.append([alpha_t]) #store the weight assosiated with this classifier.
+        alpha_t = 1/2 * np.log((1-e_t)/e_t) #How much we need to adjust the new weights.
+        weights_classifier.append([alpha_t]) #store the weight assosiated with this classifier, for later use.
 
-        #sample_w = calculateWeights(M,sample_w,predictions,E_wrong,E_correct)
-        sample_w = calculateWeightsTwo(M,sample_w,alpha_t,predictions,Y)
+        sample_w = calculateWeights(M,sample_w,alpha_t,predictions,Y)
         classification_predictions.append(tree.predict(X_test))
         #We test the tree in the current data.
         #store ever prediction of every classifier.
@@ -118,18 +116,22 @@ def addaBoost(T, trainingData, testData):
         #print(sign_predictions)
         #print(Y_test)
         Error = np.sum(sign_predictions != Y_test)
-        Correct = np.sum(sign_predictions == Y_test)
+        #Correct = np.sum(sign_predictions == Y_test)
         #print(Error+Correct)
         #print(correct)
-        Error_rate = Error/(Error + Correct) * 100
-        pyplot.plot(t,Error_rate,'-o')
-        print("Error rate itteration {} is {}%".format(t, Error_rate))
+        Error_rate = Error/M_test * 100
+        pyplot.plot(t,Error_rate,'r+')
+        print("Error rate itteration {} is {}% ".format(t, Error_rate))
         #Calculate the error from this.
+    pyplot.ylim([0,50])
+    pyplot.xlabel("Itterations")
+    pyplot.ylabel("Error rate in %")
     pyplot.show()
+    
     return weights_classifier
 
 adaboost_test = loadData("dataset/adaboost_test.csv")
-weights = addaBoost(100, adaboost_train, adaboost_test)
+weights = addaBoost(200, adaboost_train, adaboost_test)
 #Run som tests
 
 
