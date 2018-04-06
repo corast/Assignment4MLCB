@@ -1,8 +1,9 @@
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import cross_validate
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as pyplot
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_validate
 
 #Setup the tree, so that we have the same type of tree for each itteration, which split on the largest entropy attribute.
 
@@ -83,6 +84,7 @@ def addaBoost(T, trainingData, testData):
         predictions = tree.predict(X)
         #predictions2 = tree.predict(X_test)
         #We need to take the prediction and figure out how many are wrong, and adjust those
+        """ TODO: Feil, skal legge sammen vektene ikke bare at de er feil"""
         E_wrong = np.array([int(i) for i in (predictions != Y)]) #create list of which index is wrong
         E_correct = np.array([int(i) for i in (predictions == Y)]) #create list of which index is wrong
 
@@ -127,7 +129,7 @@ def addaBoost(T, trainingData, testData):
     return weights_classifier
 
 adaboost_test = loadData("dataset/adaboost_test.csv")
-weights = addaBoost(400, adaboost_train, adaboost_test)
+weights = addaBoost(100, adaboost_train, adaboost_test)
 #Run som tests
 
 
