@@ -9,7 +9,6 @@ from sklearn.model_selection import cross_validate
 
 dtree = DecisionTreeClassifier(max_depth=1)
 
-
 def loadData(file):
     #We do not want the firs row, and we do not want the tree to select from first columb.
     df = pd.read_csv(file, sep=',', header=0)
@@ -19,43 +18,24 @@ def loadData(file):
 adaboost_train = loadData("dataset/adaboost_train.csv")
 #Index 0 is the index, 1 is the y value, rest are attributes for classifying.
 
-
-def INCORRECT_calculateWeightsOLD(M,sample_w, prediction,E_wrong, E_correct):
-    #From wikipedia: Sum_weigths_correct_t+1/Sum_weigths_wrong_t+1 = Sum_weigths_correct_t/Sum_weigths_wrong_t
-    #Which simplifies calculating the new weights.
-    #Weights of all correct is 1/2, weight of all wrong is 1/2 
-    #we can simplify the calculation of new weights.
-    Z_c = sum(np.multiply(sample_w,E_correct))
-    Z_w = sum(np.multiply(sample_w,E_wrong))
-
-    #difference in the new weights
-    W_correct = Z_c/sum(E_correct)
-    W_wrong = Z_w/sum(E_wrong)
-
-    for i,wrong in enumerate(E_wrong):
-        if(wrong == 1):
-            sample_w[i] = sample_w[i]+W_wrong
-        else:
-            sample_w[i] = sample_w[i]-W_correct
-    #print(sum(sample_w))
-    return sample_w
-
 def calculateWeights(M,sample_w, alpha_t,predictions,Y):
     """ Calculate weights """
     Z = 0
-    for m, weight in enumerate(sample_w):
+    #for m, weight in enumerate(sample_w):
         #Need to calculate
-        Z += weight*np.exp(-alpha_t*predictions[m]*Y[m])
-    
+        #Z += weight*np.exp(-alpha_t*predictions[m]*Y[m])
+    #sample_w_t = np.array(sample_w,copy=True) #Debugging if same result
     #for m in range(M):
-    #    sample_w[m] = (sample_w[m]*np.exp(-alpha_t*predictions[m]*Y[m]))/Z
-    #print(sum(sample_w))
-    A = np.multiply(Y,-alpha_t)
-    B = np.multiply(predictions,A)
-    C = np.multiply(B,Z)
-    D = np.exp(C)
-    sample_w = np.multiply(sample_w, D)
-    #sample_w = np.multiply(sample_w,np.exp(-alpha_t*predictions*Y),Z)
+    #    sample_w_t[m] = (sample_w[m]*np.exp(-alpha_t*predictions[m]*Y[m]))/Z
+    #print(sample_w_t)
+    #Re implemented the loop, to speed things up a bit.
+    A = np.multiply(Y,predictions)
+    B = np.multiply(-alpha_t, A)
+    C = np.exp(B)
+    D = np.multiply(C,sample_w)
+    Z = sum(D)
+    sample_w = np.multiply(D,1/Z)
+    #print(sample_w)
     return sample_w
 
 
@@ -126,14 +106,11 @@ def addaBoost(T, trainingData, testData):
     pyplot.ylim([0,50])
     pyplot.xlabel("Itterations")
     pyplot.ylabel("Error rate in %")
+    pyplot.grid()
     pyplot.show()
     
     return weights_classifier
 
 adaboost_test = loadData("dataset/adaboost_test.csv")
-weights = addaBoost(200, adaboost_train, adaboost_test)
-#Run som tests
 
-
-
-#print(classifiers)
+weights = addaBoost(1000, adaboost_train, adaboost_test)
