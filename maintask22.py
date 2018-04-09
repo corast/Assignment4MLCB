@@ -20,7 +20,6 @@ adaboost_train = loadData("dataset/adaboost_train.csv")
 
 def calculateWeights(M,sample_w, alpha_t,predictions,Y):
     """ Calculate weights """
-    Z = 0
     #for m, weight in enumerate(sample_w):
         #Need to calculate
         #Z += weight*np.exp(-alpha_t*predictions[m]*Y[m])
@@ -28,16 +27,16 @@ def calculateWeights(M,sample_w, alpha_t,predictions,Y):
     #for m in range(M):
     #    sample_w_t[m] = (sample_w[m]*np.exp(-alpha_t*predictions[m]*Y[m]))/Z
     #print(sample_w_t)
-    #Re implemented the loop, to speed things up a bit.
+    #Re implemented the loops as matrix multiplication, to speed things up.
+    #The only downfall, is that once memory is full for each itteration it seems to slow down alot
     A = np.multiply(Y,predictions)
     B = np.multiply(-alpha_t, A)
     C = np.exp(B)
     D = np.multiply(C,sample_w)
     Z = sum(D)
     sample_w = np.multiply(D,1/Z)
-    #print(sample_w)
-    return sample_w
 
+    return sample_w
 
 def addaBoost(T, trainingData, testData):
     """ Perform boost with decision tree stumps
@@ -73,44 +72,42 @@ def addaBoost(T, trainingData, testData):
         alpha_t = 1/2 * np.log((1-e_t)/e_t) #How much we need to adjust the new weights.
         weights_classifier.append([alpha_t]) #store the weight assosiated with this classifier, for later use.
 
+        #update weights.
         sample_w = calculateWeights(M,sample_w,alpha_t,predictions,Y)
+        #Store the prediction of each new classifier. (doesnt matter since we don't need to test on any other dataset)
         classification_predictions.append(tree.predict(X_test))
-        #We test the tree in the current data.
-        #store ever prediction of every classifier.
 
-        predictionMatrix = []
+        #We test the prediction of every tree for ever itteration.
 
-        for prediction in classification_predictions:
-            #Check the result thus far for every iteration.
-            predictionMatrix.append(list(prediction))
-        
-        predictionMatrix = np.asarray(predictionMatrix)
+        #get workable narray
+        predictionMatrix = np.asarray(classification_predictions)
+        #get workable narray
         weightMatrix = np.asarray(weights_classifier)
-        #print("new line")
         #calculate the sum of a_t*f_t(x)
-        guess = np.multiply(weightMatrix, predictionMatrix)
-        guess_T = np.transpose(guess)
+        adaboost_test = np.multiply(weightMatrix, predictionMatrix)
+   
+        #transpose since we want ever a tree predicion for every column and one prediction on ever row.
+        adaboost_test_T = np.transpose(adaboost_test)
 
-        #figure out the final verdict from the trees.
-        sign_predictions = np.sign(guess_T.sum(axis=1))
-        #print(sign_predictions)
-        #print(Y_test)
-        Error = np.sum(sign_predictions != Y_test)
+        #figure out the final verdict from the trees into one vector for every row of data.
+        sign_predictions = np.sign(adaboost_test_T.sum(axis=1))
+
+        Error = np.sum(sign_predictions != Y_test) #add up ever row that is not equal.
         #Correct = np.sum(sign_predictions == Y_test)
-        #print(Error+Correct)
-        #print(correct)
-        Error_rate = Error/M_test * 100
-        pyplot.plot(t,Error_rate,'r+')
-        print("Error rate itteration {} is {}% ".format(t, Error_rate))
+
         #Calculate the error from this.
+        Error_rate = Error/M_test * 100
+        pyplot.plot(t,Error_rate,'r+')#plot
+        print("Error rate itteration {} is {}% ".format(t, Error_rate))
+        
     pyplot.ylim([0,50])
     pyplot.xlabel("Itterations")
     pyplot.ylabel("Error rate in %")
-    pyplot.grid()
+    pyplot.grid() #easier to visualize
     pyplot.show()
     
     return weights_classifier
 
 adaboost_test = loadData("dataset/adaboost_test.csv")
 
-weights = addaBoost(1000, adaboost_train, adaboost_test)
+weights = addaBoost(200, adaboost_train, adaboost_test)
