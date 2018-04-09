@@ -74,6 +74,7 @@ def addaBoost(T, trainingData, testData):
 
         #update weights.
         sample_w = calculateWeights(M,sample_w,alpha_t,predictions,Y)
+
         #Store the prediction of each new classifier. (doesnt matter since we don't need to test on any other dataset)
         classification_predictions.append(tree.predict(X_test))
 
