@@ -15,8 +15,8 @@ from sklearn.ensemble import RandomForestClassifier
 digits = datasets.load_digits()
 #Get the X and Y valuse from the dataset
 X,Y = digits.get("data"), digits.get("target")
-#Split the data into training and test set.
-X_train, X_test, Y_train, Y_test = train_test_split(X,Y)
+#Split the data into training and test set. random_State is set, so that result doesn't change from each itteration to the next.
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y, random_state=0)
 
 target_names = [x for x in range(10)]
 
@@ -27,7 +27,7 @@ def knn_testk_values():
         neigh.fit(X_train,Y_train)
         result = neigh.score(X_test, Y_test)
         print("k=%d accuaracy=%.2f%%" % (k, result*100 ))
-
+#knn_testk_values()
 neigh = KNeighborsClassifier()
 neigh.fit(X_train,Y_train)
 print("untuned KNN: accuaracy=%.2f%% " % (neigh.score(X_test, Y_test)*100) )
@@ -52,7 +52,7 @@ def svm_gamma():
         result = svmClassifier.score(X_test, Y_test)
         print("gamma=%f accuaracy=%.2f%%" % (gamma, result*100 ))
 
-
+#svm_gamma()
 svmClassifier = svm.SVC()
 svmClassifier.fit(X_train, Y_train)
 print("untuned SVM: accuaracy=%.2f%% " % (svmClassifier.score(X_test, Y_test)*100) )

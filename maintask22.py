@@ -80,17 +80,16 @@ def addaBoost(T, trainingData, testData):
 
         #We test the prediction of every tree for ever itteration.
 
-        #get workable narray
+        #get workable narray, from list -> numpy.ndarray
         predictionMatrix = np.asarray(classification_predictions)
-        #get workable narray
+        #get workable narray, from list -> numpy.ndarray
         weightMatrix = np.asarray(weights_classifier)
-        #calculate the sum of a_t*f_t(x)
+        #calculate the sum of a_t*f_t(x), shape = (1, 2400)
         adaboost_test = np.multiply(weightMatrix, predictionMatrix)
-   
         #transpose since we want ever a tree predicion for every column and one prediction on ever row.
+        #shape = (2400,)
         adaboost_test_T = np.transpose(adaboost_test)
-
-        #figure out the final verdict from the trees into one vector for every row of data.
+        #figure out the final verdict from the trees into one vector for every row of data. shape = (2400,)
         sign_predictions = np.sign(adaboost_test_T.sum(axis=1))
 
         Error = np.sum(sign_predictions != Y_test) #add up ever row that is not equal.
@@ -98,7 +97,7 @@ def addaBoost(T, trainingData, testData):
 
         #Calculate the error from this.
         Error_rate = Error/M_test * 100
-        pyplot.plot(t,Error_rate,'r+')#plot
+        pyplot.plot(t, Error_rate, 'r+')#plot
         print("Error rate itteration {} is {}% ".format(t, Error_rate))
         
     pyplot.ylim([0,50])
@@ -111,4 +110,4 @@ def addaBoost(T, trainingData, testData):
 
 adaboost_test = loadData("dataset/adaboost_test.csv")
 
-weights = addaBoost(200, adaboost_train, adaboost_test)
+weights = addaBoost(300, adaboost_train, adaboost_test)
