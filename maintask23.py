@@ -76,6 +76,7 @@ randomForestClassifier.fit(X_train, Y_train)
 print("untuned RandomForest: accuaracy=%.2f%% " % (randomForestClassifier.score(X_test, Y_test)*100) )
 randomForestClassifier = RandomForestClassifier(n_estimators=64)
 randomForestClassifier.fit(X_train, Y_train)
+
 predict_rfc = randomForestClassifier.predict(X_test)
 print("tuned RandomForest: accuaracy=%.2f%% " % (randomForestClassifier.score(X_test, Y_test)*100) )
 cm_rfc = confusion_matrix(Y_test, predict_rfc)
@@ -123,5 +124,11 @@ plot_confision_matrix(cm_svm, classes=target_names, title="Normalized Confusion 
 
 plt.figure()
 plot_confision_matrix(cm_rfc, classes=target_names, title="Normalized Confusion matrix Random Forest",normalized=True)
+
+#Plot signatures
+print(neigh)
+print(svmClassifier)
+print(randomForestClassifier)
+
 
 plt.show()
