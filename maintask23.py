@@ -105,7 +105,6 @@ def plot_confision_matrix(cm, classes, title='confusion matrix', cmap=plt.cm.Blu
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
-
 #Plot confision matrix for each classifier.
 plt.figure()
 plot_confision_matrix(cm_knn, classes=target_names, title="Confusion matrix K-nn")
