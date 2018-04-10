@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as pyplot
+import timeit
 
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_validate
@@ -49,6 +50,7 @@ def addaBoost(T, trainingData, testData):
     #store the weight assosiated with ech classifier
     weights_classifier = []
     classification_predictions = [] #Store the prediction of every tree.
+    classification_predictions_training = []
     #Seperate attributes from classification
     Y = trainingData[:,0]
     M = len(Y) #number of data entries.
@@ -104,10 +106,11 @@ def addaBoost(T, trainingData, testData):
     pyplot.xlabel("Itterations")
     pyplot.ylabel("Error rate in %")
     pyplot.grid() #easier to visualize
-    pyplot.show()
     
-    return weights_classifier
 
 adaboost_test = loadData("dataset/adaboost_test.csv")
-
-weights = addaBoost(300, adaboost_train, adaboost_test)
+start = timeit.default_timer()
+addaBoost(200, adaboost_train, adaboost_test)
+stop = timeit.default_timer()
+print("Adatime: {} seconds".format(stop-start))
+pyplot.show()
