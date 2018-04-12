@@ -125,10 +125,9 @@ plot_confision_matrix(cm_svm, classes=target_names, title="Normalized Confusion 
 plt.figure()
 plot_confision_matrix(cm_rfc, classes=target_names, title="Normalized Confusion matrix Random Forest",normalized=True)
 
-#Plot signatures
+#print signatures
 print(neigh)
 print(svmClassifier)
 print(randomForestClassifier)
 
-
-plt.show()
+plt.show() 

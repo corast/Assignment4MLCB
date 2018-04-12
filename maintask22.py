@@ -112,5 +112,5 @@ adaboost_test = loadData("dataset/adaboost_test.csv")
 start = timeit.default_timer()
 addaBoost(200, adaboost_train, adaboost_test)
 stop = timeit.default_timer()
-print("Adatime: {} seconds".format(stop-start))
+print("Adatime: {} seconds".format(stop-start)) #Time the run time of adaboost.
 pyplot.show()
